@@ -20,7 +20,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{a8501a9f-6622-46a3-9044-3ad522fb9b20}</ProjectGuid>
     <SourceWebPhysicalPath>$(MSBuildThisFileDirectory)</SourceWebPhysicalPath>
-    <SourceWebVirtualPath>/WebSite1</SourceWebVirtualPath>
+    <SourceWebVirtualPath>/remosic</SourceWebVirtualPath>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <SourceWebProject></SourceWebProject>
     <SourceWebMetabasePath></SourceWebMetabasePath>
