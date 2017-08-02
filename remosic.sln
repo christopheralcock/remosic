@@ -1,23 +1,23 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "remosic", "C:\personal-projects\remosic\WebSite1\", "{C9E1D3B2-75F9-41A1-9A44-A7F18BAF9120}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "remosic", "C:\personal-projects\remosic\", "{C9E1D3B2-75F9-41A1-9A44-A7F18BAF9120}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_58425"
-		Debug.AspNetCompiler.PhysicalPath = "C:\personal-projects\remosic\WebSite1\"
+		Debug.AspNetCompiler.PhysicalPath = "C:\personal-projects\remosic\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58425\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/localhost_58425"
-		Release.AspNetCompiler.PhysicalPath = "C:\personal-projects\remosic\WebSite1\"
+		Release.AspNetCompiler.PhysicalPath = "C:\personal-projects\remosic\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58425\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "58425"
-		SlnRelativePath = "C:\personal-projects\remosic\WebSite1\"
+		SlnRelativePath = "C:\personal-projects\remosic\"
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject
