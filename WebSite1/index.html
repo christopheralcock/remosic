@@ -1,0 +1,368 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>ASP.NET SignalR Stock Ticker</title>
+    <link href="/SignalR.Sample/StockTicker.css" rel="stylesheet" />
+    <script src="./build/Tone.js"></script>
+    <script src="./scripts/jquery.min.js"></script>
+    <script src="./scripts/draggabilly.js"></script>
+    <script src="./scripts/StartAudioContext.js"></script>
+    <script src="./scripts/Interface.js"></script>
+    <script src="https://tonejs.github.io/Logo/build/Logo.js"></script>
+    <script src="./scripts/nexusUI.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style/examples.css">
+    <script>
+		// jshint ignore: start
+    </script>
+</head>
+<body>
+    <h1>ASP.NET SignalR Stock Ticker Sample</h1>
+
+    <input type="button" id="open" value="Open Market" />
+    <input type="button" id="close" value="Close Market" disabled="disabled" />
+    <input type="button" id="reset" value="Reset" />
+
+    <h2>Live Stock Table</h2>
+    <div id="stockTable">
+        <table border="1">
+            <thead>
+                <tr><th>Symbol</th><th>Price</th><th>Open</th><th>High</th><th>Low</th><th>Change</th><th>%</th></tr>
+            </thead>
+            <tbody>
+                <tr class="loading"><td colspan="7">loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Live Stock Ticker</h2>
+    <div id="stockTicker">
+        <div class="inner">
+            <ul>
+                <li class="loading">loading...</li>
+            </ul> 
+        </div>
+    </div>
+    <div id="Content">
+        <div id="Title">Play Along With Exox</div>
+        <div id="Explanation">
+            Touch/Mouse and drag to play along with the probabilistic backtrack. X = pitch, Y = modulation.
+        </div>
+    </div>
+    <script>
+
+        //DRUMS//
+
+        //and a compressor
+        var drumCompress = new Tone.Compressor({
+            "threshold": -20,
+            "ratio": 6,
+            "attack": 0.3,
+            "release": 0.1
+        }).toMaster();
+
+        var distortion = new Tone.Distortion({
+            "distortion": 1,
+            "wet": 0.8
+        });
+
+        //hats
+        var hats = new Tone.Sampler({
+            "url": "https://tonejs.github.io/examples/audio/505/hh.mp3",
+            "volume": -10,
+            "envelope": {
+                "attack": 0.011,
+                "decay": 0.02,
+                "sustain": 0.01,
+                "release": 1.01
+            }
+        }).chain(distortion, drumCompress);
+
+        var hatsLoop = new Tone.Loop({
+            "callback": function (time) {
+                hats.triggerAttackRelease(0, "8n", time);
+            },
+            "interval": "16n",
+            "probability": 0.8
+        }).start("0m");
+
+        //SNARE PART
+        var snare = new Tone.Sampler({
+            "url": "https://tonejs.github.io/examples/audio/505/snare.mp3",
+            "envelope": {
+                "attack": 0.01,
+                "decay": 1,
+                "sustain": 1
+            },
+        }).chain(distortion).toMaster()
+
+        var snarePart = new Tone.Sequence(function (time, velocity) {
+            snare.triggerAttackRelease(0, "8n", time, velocity);
+        }, [null, null, [1, 1], [1, 1], null, null, 1, [null, .6]]).start(0);
+
+        var kick = new Tone.MembraneSynth({
+            "pitchDecay": 0.01,
+            "octaves": 6,
+            "oscillator": {
+                "type": "square4"
+            },
+            "envelope": {
+                "attack": 0.001,
+                "decay": .2,
+                "sustain": .2
+            }
+        }).connect(drumCompress);
+
+        var kickPart = new Tone.Sequence(function (time, probability) {
+            if (Math.random() < probability) {
+                kick.triggerAttack("C1", time);
+            }
+        }, [1, 1, null, null, 1, 1, null, null], "1n").start(0);
+
+        // BASS
+        var bass = new Tone.MonoSynth(
+
+            {
+                "filter": {
+                    type: "lowpass",
+                    frequency: 3500,
+                    rolloff: -12,
+                    Q: 0,
+                    gain: 10
+                }
+            }
+        ).connect(drumCompress);
+
+
+        var bassPart = new Tone.Part(function (time, event) {
+            if (Math.random() < event.prob) {
+                bass.triggerAttackRelease(event.note, event.dur, time);
+            }
+        },
+
+
+            [
+
+
+
+                { time: "0", note: "B1", dur: "16n", prob: 1 },
+                { time: "0:0.5", note: "b1", dur: "16n", prob: 1 },
+                { time: "0:1", note: "b1", dur: "16n", prob: 1 },
+                { time: "0:1.5", note: "d#2", dur: "16n", prob: 1 },
+                { time: "0:2", note: "b1", dur: "16n", prob: 1 },
+                { time: "0:3", note: "b1", dur: "16n", prob: 1 },
+                { time: "0:3.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "1:0", note: "b1", dur: "16n", prob: 1 },
+                { time: "1:0.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "1:1", note: "f#1", dur: "16n", prob: 1 },
+
+                { time: "2:0", note: "B1", dur: "16n", prob: 1 },
+                { time: "2:0.5", note: "b1", dur: "16n", prob: 1 },
+                { time: "2:1", note: "b1", dur: "16n", prob: 1 },
+                { time: "2:1.5", note: "d#2", dur: "16n", prob: 1 },
+                { time: "2:2", note: "b1", dur: "16n", prob: 1 },
+                { time: "2:3", note: "b1", dur: "16n", prob: 1 },
+                { time: "2:3.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "3:0", note: "b1", dur: "16n", prob: 1 },
+                { time: "3:0.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "3:1", note: "f#1", dur: "16n", prob: 1 },
+
+
+                { time: "4:0", note: "B1", dur: "16n", prob: 1 },
+                { time: "4:0.5", note: "b1", dur: "16n", prob: 1 },
+                { time: "4:1", note: "b1", dur: "16n", prob: 1 },
+                { time: "4:1.5", note: "d#2", dur: "16n", prob: 1 },
+                { time: "4:2", note: "b1", dur: "16n", prob: 1 },
+                { time: "4:3", note: "b1", dur: "16n", prob: 1 },
+                { time: "4:3.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "5:0", note: "b1", dur: "16n", prob: 1 },
+                { time: "5:0.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "5:1", note: "f#1", dur: "16n", prob: 1 },
+
+                { time: "6:0", note: "B1", dur: "16n", prob: 1 },
+                { time: "6:0.5", note: "b1", dur: "16n", prob: 1 },
+                { time: "6:1", note: "b1", dur: "16n", prob: 1 },
+                { time: "6:1.5", note: "d#2", dur: "16n", prob: 1 },
+                { time: "6:2", note: "b1", dur: "16n", prob: 1 },
+                { time: "6:3", note: "b1", dur: "16n", prob: 1 },
+                { time: "6:3.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "7:0", note: "b1", dur: "16n", prob: 1 },
+                { time: "7:0.5", note: "a#1", dur: "16n", prob: 1 },
+                { time: "7:1", note: "f#1", dur: "16n", prob: 1 },
+
+
+                { time: "8:0", note: "E1", dur: "16n", prob: 1 },
+                { time: "8:0.5", note: "E1", dur: "16n", prob: 1 },
+                { time: "8:1", note: "E1", dur: "16n", prob: 1 },
+                { time: "8:1.5", note: "G#1", dur: "16n", prob: 1 },
+                { time: "8:2", note: "E1", dur: "16n", prob: 1 },
+                { time: "8:3", note: "E1", dur: "16n", prob: 1 },
+                { time: "8:3.5", note: "D#1", dur: "16n", prob: 1 },
+                { time: "9:0", note: "E1", dur: "16n", prob: 1 },
+                { time: "9:0.5", note: "D#1", dur: "16n", prob: 1 },
+                { time: "9:1", note: "B0", dur: "16n", prob: 1 },
+
+                { time: "10:0", note: "A1", dur: "16n", prob: 1 },
+                { time: "10:0.5", note: "A1", dur: "16n", prob: 1 },
+                { time: "10:1", note: "A1", dur: "16n", prob: 1 },
+                { time: "10:1.5", note: "C#2", dur: "16n", prob: 1 },
+                { time: "10:2", note: "A1", dur: "16n", prob: 1 },
+                { time: "10:3", note: "A1", dur: "16n", prob: 1 },
+                { time: "10:3.5", note: "G#1", dur: "16n", prob: 1 },
+                { time: "11:0", note: "A1", dur: "16n", prob: 1 },
+                { time: "11:0.5", note: "G#1", dur: "16n", prob: 1 },
+                { time: "11:1", note: "E1", dur: "16n", prob: 1 },
+
+
+                { time: "12:0", note: "E1", dur: "16n", prob: 1 },
+                { time: "12:0.5", note: "E1", dur: "16n", prob: 1 },
+                { time: "12:1", note: "E1", dur: "16n", prob: 1 },
+                { time: "12:1.5", note: "G#1", dur: "16n", prob: 1 },
+                { time: "12:2", note: "E1", dur: "16n", prob: 1 },
+                { time: "12:3", note: "E1", dur: "16n", prob: 1 },
+                { time: "12:3.5", note: "D#1", dur: "16n", prob: 1 },
+                { time: "13:0", note: "E1", dur: "16n", prob: 1 },
+                { time: "13:0.5", note: "D#1", dur: "16n", prob: 1 },
+                { time: "13:1", note: "B0", dur: "16n", prob: 1 },
+
+                { time: "14:0", note: "A1", dur: "16n", prob: 1 },
+                { time: "14:0.5", note: "A1", dur: "16n", prob: 1 },
+                { time: "14:1", note: "A1", dur: "16n", prob: 1 },
+                { time: "14:1.5", note: "C#2", dur: "16n", prob: 1 },
+                { time: "14:2", note: "A1", dur: "16n", prob: 1 },
+                { time: "14:3", note: "A1", dur: "16n", prob: 1 },
+                { time: "14:3.5", note: "G#1", dur: "16n", prob: 1 },
+                { time: "15:0", note: "A1", dur: "16n", prob: 1 },
+                { time: "15:0.5", note: "G#1", dur: "16n", prob: 1 },
+                { time: "15:1", note: "E1", dur: "16n", prob: 1 }
+
+
+
+
+
+
+
+
+            ]
+
+
+        ).start(0);
+
+        bassPart.loop = true;
+        bassPart.loopEnd = "16m";
+
+        //SYNTH
+        var synth = new Tone.DuoSynth({
+            "vibratoAmount": 0.5,
+            "vibratoRate": 5,
+            "portamento": 0.1,
+            "harmonicity": 1.005,
+            "volume": 1,
+            "voice0": {
+                "volume": -2,
+                "oscillator": {
+                    "type": "sawtooth"
+                },
+                "filter": {
+                    "Q": 1,
+                    "type": "lowpass",
+                    "rolloff": -24
+                },
+                "envelope": {
+                    "attack": 0.01,
+                    "decay": 0.25,
+                    "sustain": 1,
+                    "release": 1.2
+                },
+                "filterEnvelope": {
+                    "attack": 0.001,
+                    "decay": 0.05,
+                    "sustain": 1,
+                    "release": 2,
+                    "baseFrequency": 100,
+                    "octaves": 4
+                }
+            },
+            "voice1": {
+                "volume": 10,
+                "oscillator": {
+                    "type": "sawtooth"
+                },
+                "filter": {
+                    "Q": 2,
+                    "type": "bandpass",
+                    "rolloff": -12
+                },
+                "envelope": {
+                    "attack": 0.25,
+                    "decay": 4,
+                    "sustain": 0.1,
+                    "release": 0.8
+                },
+                "filterEnvelope": {
+                    "attack": 0.05,
+                    "decay": 0.05,
+                    "sustain": 0.7,
+                    "release": 2,
+                    "baseFrequency": 5000,
+                    "octaves": -1.5
+                }
+            }
+        }).toMaster();
+
+        var synthNotes = ["B3", "C#4", "D#4", "E4", "F#4", "G#4", "A#4", "B4"];
+
+        Tone.Transport.bpm.value = 120;
+
+        // GUI //
+
+        Interface.Button({
+            key: 32,
+            type: "toggle",
+            text: "Start",
+            activeText: "Stop",
+            start: function () {
+                Tone.Transport.start("+0.1");
+                $.connection.stockTicker.server.openMarket();
+            },
+            end: function () {
+                Tone.Transport.stop();
+                $.connection.stockTicker.server.closeMarket();
+            }
+        });
+
+        var lastSynthNote = synthNotes[0];
+        Interface.Dragger({
+            // container : "#Content",
+            x: {
+                options: synthNotes,
+                drag: function (note) {
+                    synth.setNote(note);
+                    lastSynthNote = note;
+                }
+            },
+            y: {
+                min: 0,
+                max: 2,
+                drag: function (val) {
+                    synth.vibratoAmount.value = val;
+                }
+            },
+            start: function () {
+                synth.triggerAttack(lastSynthNote);
+            },
+            end: function () {
+                synth.triggerRelease();
+            },
+            name: "Synth"
+        });
+
+        Interface.Loader();
+
+    </script>
+    <script src="/SignalR.Sample/jquery-1.10.2.min.js"></script>
+    <script src="/SignalR.Sample/jquery.color-2.1.2.min.js"></script>
+    <script src="/Scripts/jquery.signalR-2.2.2.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script src="/SignalR.Sample/SignalR.StockTicker.js"></script>
+</body>
+</html>
